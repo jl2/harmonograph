@@ -253,22 +253,22 @@
                                            :scale (random-double 0.001d0 0.05d0))
 
 
-   :d1 (harmonograph:make-transition-value :current (random-double 0.95d0 1.0d0)
+   :d1 (harmonograph:make-transition-value :current (random-double 0.0d0 0.05d0)
                                            :lower (random-integer 15 20) 
                                            :upper (random-integer 21 25)
                                            :scale 0.0001d0)
 
-   :d2 (harmonograph:make-transition-value :current (random-double 0.95d0 1.0d0)
+   :d2 (harmonograph:make-transition-value :current (random-double 0.0d0 0.05d0)
                                            :lower (random-integer 15 20) 
                                            :upper (random-integer 21 25)
                                            :scale 0.0001d0)
 
-   :d3 (harmonograph:make-transition-value :current (random-double 0.95d0 1.0d0)
+   :d3 (harmonograph:make-transition-value :current (random-double 0.0d0 0.05d0)
                                            :lower (random-integer 15 20) 
                                            :upper (random-integer 21 25)
                                            :scale 0.0001d0)
 
-   :d4 (harmonograph:make-transition-value :current (random-double 0.95d0 1.0d0)
+   :d4 (harmonograph:make-transition-value :current (random-double 0.0d0 0.05d0)
                                            :lower (random-integer 15 20) 
                                            :upper (random-integer 21 25)
                                            :scale 0.0001d0)
