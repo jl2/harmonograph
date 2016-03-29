@@ -10,11 +10,13 @@
   (upper 2 :type (unsigned-byte 32))
   (scale 1.0d0 :type double-float))
 
-(defun deep-copy-transition-value (tv)
-  (make-transition-value :current (transition-value-current tv)
-                         :lower (transition-value-lower tv)
-                         :upper (transition-value-upper tv)
-                         :scale (transition-value-scale tv)))
+(defgeneric deep-copy (object))
+
+(defmethod deep-copy ((object transition-value))
+  (make-transition-value :current (transition-value-current object)
+                         :lower (transition-value-lower object)
+                         :upper (transition-value-upper object)
+                         :scale (transition-value-scale object)))
 
 
 (defun gv (tv)
@@ -152,23 +154,23 @@
   (y-dim (make-damped-pendulum)))
 
 
-(defun deep-copy-damped-sine (ds)
+(defmethod deep-copy ((ds damped-sine))
   (make-damped-sine 
-   :amplitude (deep-copy-transition-value (damped-sine-amplitude ds))
-   :frequency (deep-copy-transition-value (damped-sine-frequency ds))
-   :phase (deep-copy-transition-value (damped-sine-phase ds))
-   :damping (deep-copy-transition-value (damped-sine-damping ds))))
+   :amplitude (deep-copy (damped-sine-amplitude ds))
+   :frequency (deep-copy (damped-sine-frequency ds))
+   :phase (deep-copy (damped-sine-phase ds))
+   :damping (deep-copy (damped-sine-damping ds))))
 
-(defun deep-copy-damped-pendulum (dp)
+(defmethod deep-copy ((dp damped-pendulum))
   (make-damped-pendulum
-   :first (deep-copy-damped-sine (damped-pendulum-first dp))
-   :second (deep-copy-damped-sine (damped-pendulum-second dp))))
+   :first (deep-copy (damped-pendulum-first dp))
+   :second (deep-copy (damped-pendulum-second dp))))
 
-(defun deep-copy-harmonograph (harm)
+(defmethod deep-copy ((harm harmonograph))
   (make-harmonograph :steps (harmonograph-steps harm)
                      :dt (harmonograph-dt harm)
-                     :x-dim (deep-copy-damped-pendulum (harmonograph-x-dim harm))
-                     :y-dim (deep-copy-damped-pendulum (harmonograph-y-dim harm))))
+                     :x-dim (deep-copy (harmonograph-x-dim harm))
+                     :y-dim (deep-copy (harmonograph-y-dim harm))))
 
 (defun create-harmonograph
     (&key
@@ -401,7 +403,7 @@
     (cl-cairo2:paint)
     
     (cl-cairo2:scale 1 1)
-    (cl-cairo2:set-line-width 0.5)
+    (cl-cairo2:set-line-width 1.25)
     (cl-cairo2:set-source-rgba 0.0 0.0 0.8 0.95)
     (flet ((cairo-line (x1 y1 x2 y2)
              (cl-cairo2:move-to x1 y1)
