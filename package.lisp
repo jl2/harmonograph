@@ -13,5 +13,8 @@
    #:cairo-draw-harmonograph
    #:make-damped-sine
    #:deep-copy-damped-sine
+   #:harmonograph-steps
+   #:harmonograph-dt
+   #:harmonograph-dt-step
    ))
 

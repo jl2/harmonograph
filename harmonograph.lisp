@@ -148,8 +148,9 @@
   (second (make-damped-sine)))
 
 (defstruct harmonograph
-  (steps 2000 :type (unsigned-byte 32))
-  (dt (/ (* 80 pi) 2000.0))
+  (steps 400 :type (unsigned-byte 32))
+  (dt (/ pi 200.0d0) :type double-float)
+  (dt-step 120 :type (unsigned-byte 32))
   (x-dim (make-damped-pendulum))
   (y-dim (make-damped-pendulum)))
 
@@ -169,13 +170,15 @@
 (defmethod deep-copy ((harm harmonograph))
   (make-harmonograph :steps (harmonograph-steps harm)
                      :dt (harmonograph-dt harm)
+                     :dt-step (harmonograph-dt-step harm)
                      :x-dim (deep-copy (harmonograph-x-dim harm))
                      :y-dim (deep-copy (harmonograph-y-dim harm))))
 
 (defun create-harmonograph
     (&key
-       (steps 2000) 
-       (dt (/ (* 80 pi) 2000.0))
+       (steps 200) 
+       (dt (/ 5000.0))
+       (dt-step 120)
        a1 f1 p1 d1
        a2 f2 p2 d2
        a3 f3 p3 d3
@@ -193,7 +196,7 @@
 (defun random-integer (imin imax)
   (+ imin (random (- imax imin))))
 
-(defun random-harmonograph (&key (steps 5000) (dt (/ pi 5000)))
+(defun random-harmonograph (&key (steps 400) (dt (/ pi 4000)) (dt-step 120))
   (let ((a-min -50.0d0)
         (a-max 50.0d0)
         (a-lower-min 1)
@@ -210,7 +213,7 @@
         (f-upper-min 11)
         (f-upper-max 20)
         (f-scale-min 0.0001d0)
-        (f-scale-max 0.005d0)
+        (f-scale-max 0.05d0)
 
         (p-min (- pi))
         (p-max pi)
@@ -218,8 +221,8 @@
         (p-lower-max 10)
         (p-upper-min 11)
         (p-upper-max 20)
-        (p-scale-min 0.001d0)
-        (p-scale-max 0.05d0)
+        (p-scale-min 0.01d0)
+        (p-scale-max 0.5d0)
 
         (d-min 0.0d0)
         (d-max 0.05d0)
@@ -227,11 +230,12 @@
         (d-lower-max 20)
         (d-upper-min 21)
         (d-upper-max 25)
-        (d-scale 0.0001d0))
+        (d-scale 0.001d0))
 
     (create-harmonograph
      :steps steps
      :dt dt
+     :dt-step dt-step
      :a1 (harmonograph:make-transition-value :current (random-double a-min  a-max)
                                              :lower (random-integer a-lower-min a-lower-max) 
                                              :upper (random-integer a-upper-min a-upper-max)
@@ -387,7 +391,7 @@
             0.0
             0.95)
            (let ((first-points (compute-harmonograph harm cur-t))
-                 (second-points (compute-harmonograph harm (+ (harmonograph-dt harm) cur-t))))
+                 (second-points (compute-harmonograph harm (+ (* (harmonograph-dt-step harm) (harmonograph-dt harm)) cur-t))))
            (funcall
             line-function
             (truncate (xmapper (car first-points)))
@@ -442,7 +446,7 @@
 
          (files-created nil)
          (harmonographs nil)
-
+         (real-harmonograph (deep-copy harmonograph))
          (full-movie-name (format nil "~a~a" real-dir-name movie-file-name))
          (full-temp-movie-name (format nil "~a~a" real-dir-name temp-movie-name))
 
@@ -460,12 +464,13 @@
              (left-fft-data (bordeaux-fft:windowed-fft (mp3-file-left-channel mp3-file) win-center fft-window-size))
              (right-fft-data (bordeaux-fft:windowed-fft (mp3-file-right-channel mp3-file) win-center fft-window-size)))
 
-        (advance-harmonograph harmonograph left-fft-data right-fft-data)
+        (advance-harmonograph real-harmonograph left-fft-data right-fft-data)
 
         ;; (when verbose (format t "~a~%" spiro))
-        (push (cons (deep-copy-harmonograph harmonograph) file-name) harmonographs)))
+        (push (cons (deep-copy real-harmonograph) file-name) harmonographs)
+        (push file-name files-created)))
 
-    (format t "Last harmonograph:~% ~a~%" harmonograph)
+    (format t "Last harmonograph:~% ~a~%" real-harmonograph)
 
     (setf lparallel:*kernel* kernel)
     (unwind-protect
@@ -491,6 +496,7 @@
   
     (if (not keep-pngs)
         (dolist (fname files-created)
-          (delete-file fname)))
-    harmonographs))
+          (if (probe-file fname)
+              (delete-file fname)))))
+  harmonograph)
 
