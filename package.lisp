@@ -3,7 +3,7 @@
 ;;;; Copyright (c) 2016 Jeremiah LaRocco <jeremiah.larocco@gmail.com>
 
 (defpackage #:harmonograph
-  (:use #:cl)
+  (:use #:cl :anim-utils)
   (:export
    #:from-mp3
    #:make-transition-value

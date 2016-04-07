@@ -11,6 +11,7 @@
                #:mpg123-ffi
                #:bordeaux-fft
                #:uiop
+               #:anim-utils
                #:cl-spark)
   :serial t
   :components ((:file "package")
